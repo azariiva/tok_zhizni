@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-users
+      author: IRZaripov
+      comment: "Создание таблицы пользователей"
+      changes:
+        - createTable:
+            tableName: users
+            remarks: "Таблица данных пользователей"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  remarks: "Логин пользователя"
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: ${blob_type}
+                  remarks: "Пароль пользователя"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  remarks: "Почта пользователя"
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: is_verified
+                  type: bool
+                  defaultValueBoolean: false
+                  remarks: "Была ли подтверждена почта пользователя"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registered_at
+                  type: bigint
+                  remarks: "Время регистрации пользователя"
+                  defaultValue: ${now_in_seconds}
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registered_at_ts
+                  type: timestamp with timezone
+                  defaultValue: ${now}
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: unconfirmed_users
+            remarks: "Таблица неподтверждённых пользователей"
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: user_id_fk
+                    referencedTableName: users
+                    referencedColumnNames: id
+                    unique: true
+              - column:
+                  name: verification_code
+                  type: varchar(255)
+                  remarks: "Код подтврждения"
+                  constraints:
+                    nullable: false

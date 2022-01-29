@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - property:
+      name: blob_type
+      value: bytea
+      dbms: postgresql
+  - property:
+      name: now
+      value: now()
+      dbms: postgresql
+  - property:
+      name: now_in_seconds
+      value: extract(epoch from current_timestamp)
+      dbms: postgresql
+
+  - includeAll:
+      path: db/changelog/init

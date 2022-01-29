@@ -1,0 +1,14 @@
+server:
+  servlet:
+    context-path: /api
+  port: 8000
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/tok_zhizni?reWriteBatchedInserts=true
+    username: tz_app
+    password: password
+    hikari:
+      schema: api_data
+  liquibase:
+    default-schema: api_data

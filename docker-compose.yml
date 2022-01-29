@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14.1-alpine
+    command: postgres
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./src/docker/config/db/dbinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./src/docker/config/db/db.conf
+    deploy:
+      resources:
+        limits:
+          cpus: '0.6'
+          memory: 2048M
+        reservations:
+          memory: 1536M
+volumes:
+  postgres-data:
+    external: false

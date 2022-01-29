@@ -1,0 +1,125 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-products
+      author: IRZaripov
+      comment: "Создание таблицы товаров и всех информационных таблиц"
+      changes:
+        - createTable:
+            tableName: manufacturers
+            remarks: "Таблица производителей товаров"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: pharmaceutical_forms
+            remarks: "Формы выпуска лекарственных препаратов"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: series
+            remarks: "Серия товара"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: products
+            remarks: "Таблица товаров"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: article
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: discount
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: info_link
+                  type: text
+              - column:
+                  name: manufacturer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: manufacturer_id_fk
+                    referencedTableName: manufacturers
+                    referencedColumnNames: id
+              - column:
+                  name: pharmaceutical_form_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: pharmaceutical_form_id_fk
+                    referencedTableName: pharmaceutical_forms
+                    referencedColumnNames: id
+        - createTable:
+            tableName: product_series
+            remarks: "Служебная таблица серий товара"
+            columns:
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: product_id_fk
+                    referencedTableName: products
+                    referencedColumnNames: id
+              - column:
+                  name: series_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: series_id_fk
+                    referencedTableName: series
+                    referencedColumnNames: id
