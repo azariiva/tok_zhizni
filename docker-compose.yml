@@ -19,6 +19,21 @@ services:
           memory: 2048M
         reservations:
           memory: 1536M
+  app:
+    image: personal/tok_zhizni
+#    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./src/docker/config/app/app.conf
+    deploy:
+      resources:
+        limits:
+          cpus: '0.6'
+          memory: 1024M
+        reservations:
+          cpus: '0.06'
+          memory: 384M
 volumes:
   postgres-data:
     external: false

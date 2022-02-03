@@ -85,9 +85,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: info_link
-                  type: text
-              - column:
                   name: manufacturer_id
                   type: bigint
                   constraints:
@@ -103,6 +100,15 @@ databaseChangeLog:
                     foreignKeyName: pharmaceutical_form_id_fk
                     referencedTableName: pharmaceutical_forms
                     referencedColumnNames: id
+              - column:
+                  name: manual
+                  type: jsonb
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: image_path
+                  type: text
         - createTable:
             tableName: product_series
             remarks: "Служебная таблица серий товара"

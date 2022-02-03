@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: import-products-data
+      author: IRZaripov
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+              - column:
+                  name: name
+                  type: string
+            encoding: UTF-8
+            file:  csv/manufacturers.csv
+            relativeToChangelogFile: true
+            separator: ","
+            tableName: manufacturers
+            usePreparedStatements: true
+        - sql:
+            dbms: postgresql
+            sql: select setval('manufacturers_id_seq', (select max(id) from manufacturers))
+        - loadData:
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+              - column:
+                  name: name
+                  type: string
+            encoding: UTF-8
+            file: csv/series.csv
+            relativeToChangelogFile: true
+            separator: ","
+            tableName: series
+            usePreparedStatements: true
+        - sql:
+            dbms: postgresql
+            sql: select setval('series_id_seq', (select max(id) from series))
+        - loadData:
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+              - column:
+                  name: name
+                  type: string
+            encoding: UTF-8
+            file: csv/pharmaceutical_forms.csv
+            relativeToChangelogFile: true
+            separator: ","
+            tableName: pharmaceutical_forms
+            usePreparedStatements: true
+        - sql:
+            dbms: postgresql
+            sql: select setval('pharmaceutical_forms_id_seq', (select max(id) from pharmaceutical_forms))
+        - loadData:
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+              - column:
+                  name: article
+                  type: string
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: price
+                  type: numeric
+              - column:
+                  name: discount
+                  type: numeric
+              - column:
+                  name: manufacturer_id
+                  type: numeric
+              - column:
+                  name: pharmaceutical_form_id
+                  type: numeric
+              - column:
+                  name: description
+                  type: string
+            encoding: UTF-8
+            file: csv/products.csv
+            relativeToChangelogFile: true
+            separator: ","
+            quotchar: "\""
+            tableName: products
+            usePreparedStatements: true
+        - sql:
+            dbms: postgresql
+            sql: select setval('products_id_seq', (select max(id) from products))

@@ -14,3 +14,5 @@ databaseChangeLog:
 
   - includeAll:
       path: db/changelog/init
+  - includeAll:
+      path: db/changelog/import

@@ -47,3 +47,21 @@ dependencies {
 application {
     mainClass.set("ru.mospolytech.tok_zhizni.TokZhizniApplication")
 }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
+
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+
+    val bootJarTask = this.bootJar
+    withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
+        onlyIf {
+            !bootJarTask.get().state.skipped
+        }
+        imageName = "personal/${project.name}"
+    }
+}
