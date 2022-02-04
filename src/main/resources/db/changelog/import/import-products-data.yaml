@@ -79,7 +79,7 @@ databaseChangeLog:
                   type: numeric
               - column:
                   name: description
-                  type: string
+                  type: skip
             encoding: UTF-8
             file: csv/products.csv
             relativeToChangelogFile: true

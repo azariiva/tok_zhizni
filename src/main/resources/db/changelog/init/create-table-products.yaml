@@ -101,11 +101,8 @@ databaseChangeLog:
                     referencedTableName: pharmaceutical_forms
                     referencedColumnNames: id
               - column:
-                  name: manual
-                  type: jsonb
-              - column:
                   name: description
-                  type: text
+                  type: jsonb
               - column:
                   name: image_path
                   type: text
