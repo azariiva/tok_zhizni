@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service
 import ru.mospolytech.tok_zhizni.db.entity.*
 import ru.mospolytech.tok_zhizni.db.repository.ManufacturersRepository
 import ru.mospolytech.tok_zhizni.db.repository.PharmaceuticalFormsRepository
+import ru.mospolytech.tok_zhizni.db.repository.ProductRepository
 import ru.mospolytech.tok_zhizni.db.repository.SeriesRepository
 import ru.mospolytech.tok_zhizni.service.exception.ManufacturerNotFound
 import ru.mospolytech.tok_zhizni.service.exception.PharmaceuticalFormNotFound
+import ru.mospolytech.tok_zhizni.service.exception.ProductNotFound
 import ru.mospolytech.tok_zhizni.service.exception.SeriesNotFound
 
 @Suppress("SpellCheckingInspection")
@@ -14,7 +16,8 @@ import ru.mospolytech.tok_zhizni.service.exception.SeriesNotFound
 class TokZhizniServiceImpl(
     private val manufacturersRepository: ManufacturersRepository,
     private val pharmaceuticalFormsRepository: PharmaceuticalFormsRepository,
-    private val seriesRepository: SeriesRepository
+    private val seriesRepository: SeriesRepository,
+    private val productRepository: ProductRepository
 ) : TokZhizniService {
     override fun addManufacturer(createRequest: ManufacturerCreateRequest): Manufacturer =
         manufacturersRepository.create(createRequest)
@@ -62,5 +65,24 @@ class TokZhizniServiceImpl(
     override fun deleteSeries(id: Long) {
         seriesRepository.find(id)
         seriesRepository.delete(id)
+    }
+
+    override fun addProduct(createRequest: ProductCreateRequest): Product =
+        productRepository.create(createRequest)
+
+    override fun updateProduct(id: Long, updateRequest: ProductUpdateRequest) {
+        productRepository.find(id) ?: throw ProductNotFound()
+        productRepository.update(id, updateRequest)
+    }
+
+    override fun getProduct(id: Long): Product =
+        productRepository.find(id) ?: throw ProductNotFound()
+
+    override fun getAllProducts(): List<Product> =
+        productRepository.find()
+
+    override fun deleteProduct(id: Long) {
+        productRepository.find(id) ?: throw ProductNotFound()
+        productRepository.delete(id)
     }
 }

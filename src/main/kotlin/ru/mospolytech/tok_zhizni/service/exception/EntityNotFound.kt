@@ -7,3 +7,5 @@ class ManufacturerNotFound: EntityNotFound()
 class PharmaceuticalFormNotFound: EntityNotFound()
 
 class SeriesNotFound: EntityNotFound()
+
+class ProductNotFound: EntityNotFound()

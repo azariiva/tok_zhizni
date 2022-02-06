@@ -118,4 +118,48 @@ class TokZhizniStorageController(
     ) {
         service.deleteSeries(id)
     }
+
+    @ApiOperation(value = "", tags = ["Products"])
+    @PostMapping("/products")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    fun createProduct(
+        @RequestBody createRequest: ProductCreateRequest
+    ): Product =
+        service.addProduct(createRequest)
+
+    @ApiOperation(value = "", tags = ["Products"])
+    @PutMapping("/products/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updateProduct(
+        @PathVariable("id") id: Long,
+        @RequestBody updateRequest: ProductUpdateRequest
+    ) {
+        service.updateProduct(id, updateRequest)
+    }
+
+    @ApiOperation(value = "", tags = ["Products"])
+    @GetMapping("/products/{id}")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    fun loadProduct(
+        @PathVariable("id") id: Long
+    ): Product =
+        service.getProduct(id)
+
+    @ApiOperation(value = "", tags = ["Products"])
+    @GetMapping("/products")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    fun loadProduct(): List<Product> =
+        service.getAllProducts()
+
+    @ApiOperation(value = "", tags = ["Products"])
+    @DeleteMapping("/products/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteProduct(
+        @PathVariable("id") id: Long
+    ) {
+        service.deleteProduct(id)
+    }
 }

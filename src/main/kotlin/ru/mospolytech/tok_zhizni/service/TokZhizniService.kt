@@ -19,4 +19,10 @@ interface TokZhizniService {
     fun updateSeries(id: Long, updateRequest: SeriesUpdateRequest)
     fun getAllSeries(): List<Series>
     fun deleteSeries(id: Long)
+
+    fun addProduct(createRequest: ProductCreateRequest): Product
+    fun updateProduct(id: Long, updateRequest: ProductUpdateRequest)
+    fun getProduct(id: Long): Product
+    fun getAllProducts(): List<Product>
+    fun deleteProduct(id: Long)
 }
