@@ -6,15 +6,16 @@ import org.jetbrains.exposed.sql.ResultRow
 import ru.mospolytech.tok_zhizni.db.repository.exposed.table.ProductsTable
 
 data class ProductDescription(
-    @param:[JsonProperty("Состав продукта") JsonAlias("Состав")]
+    @param:[JsonAlias("Состав продукта", "Состав")]
+    @get:JsonProperty
     val composition: String? = null,
-    @param:[JsonProperty("Стандарт упаковки") JsonAlias("Упаковка")]
+    @param:[JsonAlias("Стандарт упаковки", "Упаковка")]
     val packaging: String? = null,
-    @param:JsonProperty("Срок годности")
+    @param:JsonAlias("Срок годности")
     val shelfLife: String? = null,
-    @param:JsonProperty("Способ хранения")
+    @param:JsonAlias("Способ хранения")
     val storageMethod: String? = null,
-    @param:JsonProperty("Способ применения")
+    @param:JsonAlias("Способ применения")
     val usage: String? = null
 )
 
@@ -31,19 +32,24 @@ data class Product(
     val imagePath: String?
 ) {
     companion object {
-       inline fun fromResultRow(row: ResultRow, crossinline seriesMapFunction: (row: ResultRow) -> List<Series>): Product =
-           Product(
-               id = row[ProductsTable.id].value,
-               article = row[ProductsTable.article],
-               name = row[ProductsTable.name],
-               price = row[ProductsTable.price],
-               discount = row[ProductsTable.discount],
-               manufacturer = Manufacturer.fromResultRow(row),
-               pharmaceuticalForm = PharmaceuticalForm.fromResultRow(row),
-               series = seriesMapFunction(row),
-               description = row[ProductsTable.description],
-               imagePath = row[ProductsTable.imagePath]
-           )
+        inline fun fromResultRow(
+            row: ResultRow,
+            manufacturer: Manufacturer = Manufacturer.fromResultRow(row),
+            pharmaceuticalForm: PharmaceuticalForm = PharmaceuticalForm.fromResultRow(row),
+            crossinline seriesMapFunction: (row: ResultRow) -> List<Series>
+        ): Product =
+            Product(
+                id = row[ProductsTable.id].value,
+                article = row[ProductsTable.article],
+                name = row[ProductsTable.name],
+                price = row[ProductsTable.price],
+                discount = row[ProductsTable.discount],
+                manufacturer = manufacturer,
+                pharmaceuticalForm = pharmaceuticalForm,
+                series = seriesMapFunction(row),
+                description = row[ProductsTable.description],
+                imagePath = row[ProductsTable.imagePath]
+            )
     }
 }
 

@@ -67,11 +67,28 @@ class TokZhizniServiceImpl(
         seriesRepository.delete(id)
     }
 
-    override fun addProduct(createRequest: ProductCreateRequest): Product =
-        productRepository.create(createRequest)
+    override fun addProduct(createRequest: ProductCreateRequest): Product {
+        val manufacturer = manufacturersRepository.find(createRequest.manufacturerId) ?: throw ManufacturerNotFound()
+        val pharmaceuticalForm =
+            pharmaceuticalFormsRepository.find(createRequest.pharmaceuticalFormId) ?: throw PharmaceuticalFormNotFound()
+        val illegalSeries = createRequest.seriesIds - seriesRepository.find(createRequest.seriesIds).map { it.id }
+
+        if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
+
+        return productRepository.create(createRequest, manufacturer, pharmaceuticalForm)
+    }
 
     override fun updateProduct(id: Long, updateRequest: ProductUpdateRequest) {
         productRepository.find(id) ?: throw ProductNotFound()
+        updateRequest.manufacturerId?.let { manufacturersRepository.find(it) ?: throw ManufacturerNotFound() }
+        updateRequest.pharmaceuticalFormId?.let {
+            pharmaceuticalFormsRepository.find(it) ?: throw PharmaceuticalFormNotFound()
+        }
+        updateRequest.seriesIds?.let {
+            val illegalSeries = it - seriesRepository.find(it).map { ser -> ser.id }
+            if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
+        }
+
         productRepository.update(id, updateRequest)
     }
 

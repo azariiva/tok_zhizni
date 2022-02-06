@@ -3,10 +3,7 @@ package ru.mospolytech.tok_zhizni.db.repository.exposed
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.db.entity.Product
-import ru.mospolytech.tok_zhizni.db.entity.ProductCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.ProductUpdateRequest
-import ru.mospolytech.tok_zhizni.db.entity.Series
+import ru.mospolytech.tok_zhizni.db.entity.*
 import ru.mospolytech.tok_zhizni.db.repository.ProductRepository
 import ru.mospolytech.tok_zhizni.db.repository.exposed.table.*
 
@@ -24,7 +21,11 @@ class ProductRepositoryExposedImpl : ProductRepository {
             ?.let { Product.fromResultRow(it.first()) { row -> seriesMapFunction(row) } }
 
     @Transactional
-    override fun create(createRequest: ProductCreateRequest): Product =
+    override fun create(
+        createRequest: ProductCreateRequest,
+        manufacturer: Manufacturer,
+        pharmaceuticalForm: PharmaceuticalForm
+    ): Product =
         ProductsTable
             .insert { body ->
                 body[article] = createRequest.article
@@ -38,7 +39,11 @@ class ProductRepositoryExposedImpl : ProductRepository {
             }
             .resultedValues!!
             .let {
-                Product.fromResultRow(it.first()) {
+                Product.fromResultRow(
+                    it.first(),
+                    manufacturer = manufacturer,
+                    pharmaceuticalForm = pharmaceuticalForm
+                ) {
                     SeriesTable
                         .select { SeriesTable.id inList createRequest.seriesIds }
                         .map(Series::fromResultRow)

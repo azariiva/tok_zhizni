@@ -18,6 +18,12 @@ class SeriesRepositoryExposedImpl : SeriesRepository {
             .map(Series::fromResultRow)
 
     @Transactional(readOnly = true)
+    override fun find(ids: List<Long>): List<Series> =
+        SeriesTable
+            .select { SeriesTable.id inList ids }
+            .map(Series::fromResultRow)
+
+    @Transactional(readOnly = true)
     override fun find(id: Long): Series? =
         SeriesTable
             .select { SeriesTable.id eq id }

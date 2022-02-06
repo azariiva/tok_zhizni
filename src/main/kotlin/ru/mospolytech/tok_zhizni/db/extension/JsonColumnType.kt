@@ -29,8 +29,12 @@ class JsonColumnType<out T : Any>(
 
     override fun valueFromDB(value: Any) =
         try {
-            val json = (value as PGobject).value
-            mapper.readValue(json, klass)
+            if (value::class.java == klass) {
+                value
+            } else {
+                val json = (value as PGobject).value
+                mapper.readValue(json, klass)
+            }
         } catch (e: Exception) {
             LOGGER.error("Can't parse JSON: ${(value as PGobject)}")
         }
