@@ -118,6 +118,7 @@ databaseChangeLog:
                     foreignKeyName: product_id_fk
                     referencedTableName: products
                     referencedColumnNames: id
+                    deleteCascade: true
               - column:
                   name: series_id
                   type: bigint
@@ -126,3 +127,4 @@ databaseChangeLog:
                     foreignKeyName: series_id_fk
                     referencedTableName: series
                     referencedColumnNames: id
+                    deleteCascade: true
