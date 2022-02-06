@@ -3,9 +3,7 @@ package ru.mospolytech.tok_zhizni.rest.controller
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import ru.mospolytech.tok_zhizni.db.entity.Manufacturer
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerUpdateRequest
+import ru.mospolytech.tok_zhizni.db.entity.*
 import ru.mospolytech.tok_zhizni.service.TokZhizniService
 
 @Suppress("SpellCheckingInspection")
@@ -34,5 +32,44 @@ class TokZhizniStorageController(
         @RequestBody updateRequest: ManufacturerUpdateRequest
     ) {
         service.updateManufacturer(id, updateRequest)
+    }
+
+    @DeleteMapping("/manufacturers/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteManufacturer(
+        @PathVariable("id") id: Long
+    ) {
+        service.deleteManufacturer(id)
+    }
+
+    @GetMapping("/pharmaceutical_forms")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    fun loadPharmaceuticalForms(): List<PharmaceuticalForm> =
+        service.getAllPharmaceuticalForms()
+
+    @PostMapping("/pharmaceutical_forms")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    fun createPharmaceuticalForm(
+        @RequestBody createRequest: PharmaceuticalFormCreateRequest
+    ): PharmaceuticalForm =
+        service.addPharmaceuticalForm(createRequest)
+
+    @PutMapping("/pharmaceutical_forms/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updatePharmaceuticalForm(
+        @PathVariable("id") id: Long,
+        @RequestBody updateRequest: PharmaceuticalFormUpdateRequest
+    ) {
+        service.updatePharmaceuticalForm(id, updateRequest)
+    }
+
+    @DeleteMapping("/pharmaceutical_forms/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deletePharmaceuticalForm(
+        @PathVariable("id") id: Long
+    ) {
+        service.deletePharmaceuticalForm(id)
     }
 }

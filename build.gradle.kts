@@ -42,6 +42,10 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxCoroutinesVersion")
+
+    val springFoxVersion = "3.0.0"
+    compileOnly("io.springfox:springfox-swagger-ui:$springFoxVersion")
+    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 }
 
 application {

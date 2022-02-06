@@ -9,4 +9,5 @@ interface ManufacturersRepository {
     fun find(id: Long): Manufacturer?
     fun create(createRequest: ManufacturerCreateRequest): Manufacturer
     fun update(id: Long, updateRequest: ManufacturerUpdateRequest)
+    fun delete(id: Long)
 }

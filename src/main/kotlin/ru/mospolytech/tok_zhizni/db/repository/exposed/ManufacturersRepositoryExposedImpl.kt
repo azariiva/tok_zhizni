@@ -1,9 +1,6 @@
 package ru.mospolytech.tok_zhizni.db.repository.exposed
 
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import ru.mospolytech.tok_zhizni.db.entity.Manufacturer
@@ -40,7 +37,13 @@ class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
     override fun update(id: Long, updateRequest: ManufacturerUpdateRequest) {
         ManufacturersTable
             .update({ ManufacturersTable.id eq id }) { body ->
-                updateRequest.name?.let { body[name] = name }
+                updateRequest.name?.let { body[name] = it }
             }
+    }
+
+    @Transactional
+    override fun delete(id: Long) {
+        ManufacturersTable
+            .deleteWhere { ManufacturersTable.id eq id }
     }
 }
