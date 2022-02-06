@@ -1,6 +1,6 @@
 package ru.mospolytech.tok_zhizni.service
 
-import ru.mospolytech.tok_zhizni.db.entity.*
+import ru.mospolytech.tok_zhizni.entity.*
 
 
 @Suppress("SpellCheckingInspection")

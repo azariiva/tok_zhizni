@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import ru.mospolytech.tok_zhizni.db.entity.*
+import ru.mospolytech.tok_zhizni.entity.*
 import ru.mospolytech.tok_zhizni.service.TokZhizniService
 
 @Api(value = "", tags = ["Storage Controller"])

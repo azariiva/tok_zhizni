@@ -1,8 +1,8 @@
-package ru.mospolytech.tok_zhizni.db.repository
+package ru.mospolytech.tok_zhizni.repository
 
-import ru.mospolytech.tok_zhizni.db.entity.Series
-import ru.mospolytech.tok_zhizni.db.entity.SeriesCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.SeriesUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.Series
+import ru.mospolytech.tok_zhizni.entity.SeriesCreateRequest
+import ru.mospolytech.tok_zhizni.entity.SeriesUpdateRequest
 
 interface SeriesRepository {
     fun find(): List<Series>

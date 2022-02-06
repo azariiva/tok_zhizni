@@ -1,9 +1,7 @@
-package ru.mospolytech.tok_zhizni.db.entity
+package ru.mospolytech.tok_zhizni.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.jetbrains.exposed.sql.ResultRow
-import ru.mospolytech.tok_zhizni.db.repository.exposed.table.ProductsTable
 
 data class ProductDescription(
     @param:[JsonAlias("Состав продукта", "Состав")]
@@ -30,28 +28,7 @@ data class Product(
     val series: List<Series>,
     val description: ProductDescription?,
     val imagePath: String?
-) {
-    companion object {
-        inline fun fromResultRow(
-            row: ResultRow,
-            manufacturer: Manufacturer = Manufacturer.fromResultRow(row),
-            pharmaceuticalForm: PharmaceuticalForm = PharmaceuticalForm.fromResultRow(row),
-            crossinline seriesMapFunction: (row: ResultRow) -> List<Series>
-        ): Product =
-            Product(
-                id = row[ProductsTable.id].value,
-                article = row[ProductsTable.article],
-                name = row[ProductsTable.name],
-                price = row[ProductsTable.price],
-                discount = row[ProductsTable.discount],
-                manufacturer = manufacturer,
-                pharmaceuticalForm = pharmaceuticalForm,
-                series = seriesMapFunction(row),
-                description = row[ProductsTable.description],
-                imagePath = row[ProductsTable.imagePath]
-            )
-    }
-}
+)
 
 data class ProductCreateRequest(
     val article: String,

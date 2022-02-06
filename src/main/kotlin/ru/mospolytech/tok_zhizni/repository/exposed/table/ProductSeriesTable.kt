@@ -1,4 +1,4 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed.table
+package ru.mospolytech.tok_zhizni.repository.exposed.table
 
 import org.jetbrains.exposed.sql.Table
 

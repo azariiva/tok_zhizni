@@ -1,4 +1,4 @@
-package ru.mospolytech.tok_zhizni.db.extension
+package ru.mospolytech.tok_zhizni.repository.exposed.extension
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.jetbrains.exposed.sql.Column

@@ -1,13 +1,14 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed
+package ru.mospolytech.tok_zhizni.repository.exposed
 
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalForm
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalFormCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalFormUpdateRequest
-import ru.mospolytech.tok_zhizni.db.repository.PharmaceuticalFormsRepository
-import ru.mospolytech.tok_zhizni.db.repository.exposed.table.PharmaceuticalFormsTable
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalForm
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormCreateRequest
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormUpdateRequest
+import ru.mospolytech.tok_zhizni.repository.PharmaceuticalFormsRepository
+import ru.mospolytech.tok_zhizni.repository.exposed.extension.toPharmaceuticalForm
+import ru.mospolytech.tok_zhizni.repository.exposed.table.PharmaceuticalFormsTable
 
 @Repository
 class PharmaceuticalFormsRepositoryExposedImpl : PharmaceuticalFormsRepository {
@@ -15,14 +16,13 @@ class PharmaceuticalFormsRepositoryExposedImpl : PharmaceuticalFormsRepository {
     override fun find(): List<PharmaceuticalForm> =
         PharmaceuticalFormsTable
             .selectAll()
-            .map(PharmaceuticalForm::fromResultRow)
+            .map(ResultRow::toPharmaceuticalForm)
 
     @Transactional(readOnly = true)
     override fun find(id: Long): PharmaceuticalForm? =
         PharmaceuticalFormsTable
             .select { PharmaceuticalFormsTable.id eq id }
-            .takeIf { !it.empty() }
-            ?.let { PharmaceuticalForm.fromResultRow(it.first()) }
+            .takeIf { !it.empty() }?.first()?.toPharmaceuticalForm()
 
     @Transactional
     override fun create(createRequest: PharmaceuticalFormCreateRequest): PharmaceuticalForm =
@@ -30,13 +30,12 @@ class PharmaceuticalFormsRepositoryExposedImpl : PharmaceuticalFormsRepository {
             .insert { body ->
                 body[name] = createRequest.name
             }
-            .resultedValues!!
-            .let { PharmaceuticalForm.fromResultRow(it.first()) }
+            .resultedValues!!.first().toPharmaceuticalForm()
 
     @Transactional
     override fun update(id: Long, updateRequest: PharmaceuticalFormUpdateRequest) {
         PharmaceuticalFormsTable
-            .update({PharmaceuticalFormsTable.id eq id}) { body ->
+            .update({ PharmaceuticalFormsTable.id eq id}) { body ->
                 updateRequest.name?.let { body[name] = it }
             }
     }

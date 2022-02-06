@@ -1,8 +1,8 @@
-package ru.mospolytech.tok_zhizni.db.repository
+package ru.mospolytech.tok_zhizni.repository
 
-import ru.mospolytech.tok_zhizni.db.entity.Manufacturer
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.Manufacturer
+import ru.mospolytech.tok_zhizni.entity.ManufacturerCreateRequest
+import ru.mospolytech.tok_zhizni.entity.ManufacturerUpdateRequest
 
 interface ManufacturersRepository {
     fun find(): List<Manufacturer>

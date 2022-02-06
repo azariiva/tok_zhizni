@@ -1,13 +1,14 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed
+package ru.mospolytech.tok_zhizni.repository.exposed
 
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.db.entity.Manufacturer
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.ManufacturerUpdateRequest
-import ru.mospolytech.tok_zhizni.db.repository.ManufacturersRepository
-import ru.mospolytech.tok_zhizni.db.repository.exposed.table.ManufacturersTable
+import ru.mospolytech.tok_zhizni.entity.Manufacturer
+import ru.mospolytech.tok_zhizni.entity.ManufacturerCreateRequest
+import ru.mospolytech.tok_zhizni.entity.ManufacturerUpdateRequest
+import ru.mospolytech.tok_zhizni.repository.ManufacturersRepository
+import ru.mospolytech.tok_zhizni.repository.exposed.extension.toManufacturer
+import ru.mospolytech.tok_zhizni.repository.exposed.table.ManufacturersTable
 
 @Repository
 class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
@@ -15,14 +16,13 @@ class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
     override fun find(): List<Manufacturer> =
         ManufacturersTable
             .selectAll()
-            .map(Manufacturer::fromResultRow)
+            .map(ResultRow::toManufacturer)
 
     @Transactional(readOnly = true)
     override fun find(id: Long): Manufacturer? =
         ManufacturersTable
             .select { ManufacturersTable.id eq id }
-            .takeIf { !it.empty() }
-            ?.let { Manufacturer.fromResultRow(it.first()) }
+            .takeIf { !it.empty() }?.first()?.toManufacturer()
 
     @Transactional
     override fun create(createRequest: ManufacturerCreateRequest): Manufacturer =
@@ -30,8 +30,7 @@ class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
             .insert { body ->
                 body[name] = createRequest.name
             }
-            .resultedValues!!
-            .let { Manufacturer.fromResultRow(it.first()) }
+            .resultedValues!!.first().toManufacturer()
 
     @Transactional
     override fun update(id: Long, updateRequest: ManufacturerUpdateRequest) {

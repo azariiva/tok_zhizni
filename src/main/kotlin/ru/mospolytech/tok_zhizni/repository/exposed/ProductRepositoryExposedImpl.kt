@@ -1,28 +1,30 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed
+package ru.mospolytech.tok_zhizni.repository.exposed
 
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.db.entity.*
-import ru.mospolytech.tok_zhizni.db.repository.ProductRepository
-import ru.mospolytech.tok_zhizni.db.repository.exposed.table.*
+import ru.mospolytech.tok_zhizni.entity.*
+import ru.mospolytech.tok_zhizni.repository.ProductRepository
+import ru.mospolytech.tok_zhizni.repository.exposed.extension.toProduct
+import ru.mospolytech.tok_zhizni.repository.exposed.table.*
 
 @Repository
 class ProductRepositoryExposedImpl : ProductRepository {
     @Transactional(readOnly = true)
     override fun find(): List<Product> =
         baseSelectQuery { selectAll() }
-            .map { Product.fromResultRow(it) { row -> seriesMapFunction(row) } }
+            .map { it.toProduct(seriesMapFunction(it)) }
 
     @Transactional(readOnly = true)
     override fun find(id: Long): Product? =
         baseSelectQuery { select { ProductsTable.id eq id } }
             .takeIf { !it.empty() }
-            ?.let { Product.fromResultRow(it.first()) { row -> seriesMapFunction(row) } }
+            ?.first()?.let { it.toProduct(seriesMapFunction(it)) }
 
     @Transactional
     override fun create(
         createRequest: ProductCreateRequest,
+        series: List<Series>,
         manufacturer: Manufacturer,
         pharmaceuticalForm: PharmaceuticalForm
     ): Product =
@@ -37,20 +39,13 @@ class ProductRepositoryExposedImpl : ProductRepository {
                 createRequest.description?.let { body[description] = it }
                 createRequest.imagePath?.let { body[imagePath] = it }
             }
-            .resultedValues!!
-            .let {
-                Product.fromResultRow(
-                    it.first(),
-                    manufacturer = manufacturer,
-                    pharmaceuticalForm = pharmaceuticalForm
-                ) {
-                    SeriesTable
-                        .select { SeriesTable.id inList createRequest.seriesIds }
-                        .map(Series::fromResultRow)
-                }
-            }.also { product ->
+            .resultedValues!!.first().toProduct(
+                series,
+                manufacturer = manufacturer,
+                pharmaceuticalForm = pharmaceuticalForm
+            ).also { product ->
                 ProductSeriesTable.batchInsert(
-                    product.series,
+                    series,
                     shouldReturnGeneratedValues = false
                 ) { data ->
                     this[ProductSeriesTable.productId] = product.id

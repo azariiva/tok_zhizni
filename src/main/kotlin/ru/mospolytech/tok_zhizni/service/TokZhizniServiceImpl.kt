@@ -1,15 +1,15 @@
 package ru.mospolytech.tok_zhizni.service
 
 import org.springframework.stereotype.Service
-import ru.mospolytech.tok_zhizni.db.entity.*
-import ru.mospolytech.tok_zhizni.db.repository.ManufacturersRepository
-import ru.mospolytech.tok_zhizni.db.repository.PharmaceuticalFormsRepository
-import ru.mospolytech.tok_zhizni.db.repository.ProductRepository
-import ru.mospolytech.tok_zhizni.db.repository.SeriesRepository
-import ru.mospolytech.tok_zhizni.service.exception.ManufacturerNotFound
-import ru.mospolytech.tok_zhizni.service.exception.PharmaceuticalFormNotFound
-import ru.mospolytech.tok_zhizni.service.exception.ProductNotFound
-import ru.mospolytech.tok_zhizni.service.exception.SeriesNotFound
+import ru.mospolytech.tok_zhizni.entity.*
+import ru.mospolytech.tok_zhizni.entity.exception.ManufacturerNotFound
+import ru.mospolytech.tok_zhizni.entity.exception.PharmaceuticalFormNotFound
+import ru.mospolytech.tok_zhizni.entity.exception.ProductNotFound
+import ru.mospolytech.tok_zhizni.entity.exception.SeriesNotFound
+import ru.mospolytech.tok_zhizni.repository.ManufacturersRepository
+import ru.mospolytech.tok_zhizni.repository.PharmaceuticalFormsRepository
+import ru.mospolytech.tok_zhizni.repository.ProductRepository
+import ru.mospolytech.tok_zhizni.repository.SeriesRepository
 
 @Suppress("SpellCheckingInspection")
 @Service
@@ -71,11 +71,12 @@ class TokZhizniServiceImpl(
         val manufacturer = manufacturersRepository.find(createRequest.manufacturerId) ?: throw ManufacturerNotFound()
         val pharmaceuticalForm =
             pharmaceuticalFormsRepository.find(createRequest.pharmaceuticalFormId) ?: throw PharmaceuticalFormNotFound()
-        val illegalSeries = createRequest.seriesIds - seriesRepository.find(createRequest.seriesIds).map { it.id }
+        val series = seriesRepository.find(createRequest.seriesIds)
+        val illegalSeries = createRequest.seriesIds - series.map { it.id }
 
         if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
 
-        return productRepository.create(createRequest, manufacturer, pharmaceuticalForm)
+        return productRepository.create(createRequest, series, manufacturer, pharmaceuticalForm)
     }
 
     override fun updateProduct(id: Long, updateRequest: ProductUpdateRequest) {

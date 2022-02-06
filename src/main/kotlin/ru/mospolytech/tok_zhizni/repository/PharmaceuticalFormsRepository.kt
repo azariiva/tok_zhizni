@@ -1,8 +1,8 @@
-package ru.mospolytech.tok_zhizni.db.repository
+package ru.mospolytech.tok_zhizni.repository
 
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalForm
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalFormCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.PharmaceuticalFormUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalForm
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormCreateRequest
+import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormUpdateRequest
 
 interface PharmaceuticalFormsRepository {
     fun find(): List<PharmaceuticalForm>

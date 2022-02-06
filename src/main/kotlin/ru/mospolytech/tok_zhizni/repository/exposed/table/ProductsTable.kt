@@ -1,9 +1,9 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed.table
+package ru.mospolytech.tok_zhizni.repository.exposed.table
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.jetbrains.exposed.dao.id.IdTable
-import ru.mospolytech.tok_zhizni.db.entity.ProductDescription
-import ru.mospolytech.tok_zhizni.db.extension.jsonb
+import ru.mospolytech.tok_zhizni.entity.ProductDescription
+import ru.mospolytech.tok_zhizni.repository.exposed.extension.jsonb
 
 object ProductsTable: IdTable<Long>("products") {
     override val id = long("id").autoIncrement("products_id_seq").entityId()

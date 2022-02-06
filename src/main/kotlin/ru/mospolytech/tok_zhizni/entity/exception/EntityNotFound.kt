@@ -1,4 +1,4 @@
-package ru.mospolytech.tok_zhizni.service.exception
+package ru.mospolytech.tok_zhizni.entity.exception
 
 open class EntityNotFound: RuntimeException()
 

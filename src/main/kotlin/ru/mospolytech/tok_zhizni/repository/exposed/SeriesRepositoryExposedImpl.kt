@@ -1,13 +1,14 @@
-package ru.mospolytech.tok_zhizni.db.repository.exposed
+package ru.mospolytech.tok_zhizni.repository.exposed
 
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.db.entity.Series
-import ru.mospolytech.tok_zhizni.db.entity.SeriesCreateRequest
-import ru.mospolytech.tok_zhizni.db.entity.SeriesUpdateRequest
-import ru.mospolytech.tok_zhizni.db.repository.SeriesRepository
-import ru.mospolytech.tok_zhizni.db.repository.exposed.table.SeriesTable
+import ru.mospolytech.tok_zhizni.entity.Series
+import ru.mospolytech.tok_zhizni.entity.SeriesCreateRequest
+import ru.mospolytech.tok_zhizni.entity.SeriesUpdateRequest
+import ru.mospolytech.tok_zhizni.repository.SeriesRepository
+import ru.mospolytech.tok_zhizni.repository.exposed.extension.toSeries
+import ru.mospolytech.tok_zhizni.repository.exposed.table.SeriesTable
 
 @Repository
 class SeriesRepositoryExposedImpl : SeriesRepository {
@@ -15,20 +16,19 @@ class SeriesRepositoryExposedImpl : SeriesRepository {
     override fun find(): List<Series> =
         SeriesTable
             .selectAll()
-            .map(Series::fromResultRow)
+            .map(ResultRow::toSeries)
 
     @Transactional(readOnly = true)
     override fun find(ids: List<Long>): List<Series> =
         SeriesTable
             .select { SeriesTable.id inList ids }
-            .map(Series::fromResultRow)
+            .map(ResultRow::toSeries)
 
     @Transactional(readOnly = true)
     override fun find(id: Long): Series? =
         SeriesTable
             .select { SeriesTable.id eq id }
-            .takeIf { !it.empty() }
-            ?.let { Series.fromResultRow(it.first()) }
+            .takeIf { !it.empty() }?.first()?.toSeries()
 
     @Transactional
     override fun create(createRequest: SeriesCreateRequest): Series =
@@ -36,8 +36,7 @@ class SeriesRepositoryExposedImpl : SeriesRepository {
             .insert { body ->
                 body[name] = createRequest.name
             }
-            .resultedValues!!
-            .let { Series.fromResultRow(it.first()) }
+            .resultedValues!!.first().toSeries()
 
     @Transactional
     override fun update(id: Long, updateRequest: SeriesUpdateRequest) {
