@@ -5,3 +5,5 @@ open class EntityNotFound: RuntimeException()
 class ManufacturerNotFound: EntityNotFound()
 
 class PharmaceuticalFormNotFound: EntityNotFound()
+
+class SeriesNotFound: EntityNotFound()
