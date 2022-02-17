@@ -1,28 +1,34 @@
 package ru.mospolytech.tok_zhizni.service
 
-import ru.mospolytech.tok_zhizni.entity.*
+import ru.mospolytech.tok_zhizni.entity.dto.*
 
 
 @Suppress("SpellCheckingInspection")
 interface TokZhizniService {
-    fun addManufacturer(createRequest: ManufacturerCreateRequest): Manufacturer
-    fun updateManufacturer(id: Long, updateRequest: ManufacturerUpdateRequest)
-    fun getAllManufacturers(): List<Manufacturer>
+    fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto
+    fun updateManufacturer(id: Long, updateRequest: ManufacturerUpdateRequestDto)
+    fun getAllManufacturers(): List<ManufacturerDto>
     fun deleteManufacturer(id: Long)
 
-    fun addPharmaceuticalForm(createRequest: PharmaceuticalFormCreateRequest): PharmaceuticalForm
-    fun updatePharmaceuticalForm(id: Long, updateRequest: PharmaceuticalFormUpdateRequest)
-    fun getAllPharmaceuticalForms(): List<PharmaceuticalForm>
+    fun addPharmaceuticalForm(createRequest: PharmaceuticalFormCreateRequestDto): PharmaceuticalFormDto
+    fun updatePharmaceuticalForm(id: Long, updateRequest: PharmaceuticalFormUpdateRequestDto)
+    fun getAllPharmaceuticalForms(): List<PharmaceuticalFormDto>
     fun deletePharmaceuticalForm(id: Long)
 
-    fun addSeries(createRequest: SeriesCreateRequest): Series
-    fun updateSeries(id: Long, updateRequest: SeriesUpdateRequest)
-    fun getAllSeries(): List<Series>
+    fun addSeries(createRequest: SeriesCreateRequestDto): SeriesDto
+    fun updateSeries(id: Long, updateRequest: SeriesUpdateRequestDto)
+    fun getAllSeries(): List<SeriesDto>
     fun deleteSeries(id: Long)
 
-    fun addProduct(createRequest: ProductCreateRequest): Product
-    fun updateProduct(id: Long, updateRequest: ProductUpdateRequest)
-    fun getProduct(id: Long): Product
-    fun getAllProducts(): List<Product>
+    fun addProduct(createRequest: ProductCreateRequestDto): ProductDto
+    fun updateProduct(id: Long, updateRequest: ProductUpdateRequestDto)
+    fun getProduct(id: Long): ProductDto
+    fun getAllProducts(): List<ProductDto>
     fun deleteProduct(id: Long)
+
+    fun addUser(createRequest: UserCreateRequestDto): UserDto
+    fun updateUser(id: Long, updateRequestDto: UserUpdateRequestDto)
+    fun getUser(id: Long): UserDto
+    fun getAllUsers(): List<UserDto>
+    fun deleteUser(id: Long)
 }

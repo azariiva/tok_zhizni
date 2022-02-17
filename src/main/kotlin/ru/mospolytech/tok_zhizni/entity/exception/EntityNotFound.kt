@@ -9,3 +9,5 @@ class PharmaceuticalFormNotFound: EntityNotFound()
 class SeriesNotFound: EntityNotFound()
 
 class ProductNotFound: EntityNotFound()
+
+class UserNotFound: EntityNotFound()

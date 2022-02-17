@@ -3,13 +3,12 @@ package ru.mospolytech.tok_zhizni.repository.exposed
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.entity.*
-import ru.mospolytech.tok_zhizni.repository.ProductRepository
-import ru.mospolytech.tok_zhizni.repository.exposed.extension.toProduct
+import ru.mospolytech.tok_zhizni.entity.domain.*
+import ru.mospolytech.tok_zhizni.repository.ProductsRepository
 import ru.mospolytech.tok_zhizni.repository.exposed.table.*
 
 @Repository
-class ProductRepositoryExposedImpl : ProductRepository {
+class ProductsRepositoryExposedImpl : ProductsRepository {
     @Transactional(readOnly = true)
     override fun find(): List<Product> =
         baseSelectQuery { selectAll() }
@@ -22,30 +21,25 @@ class ProductRepositoryExposedImpl : ProductRepository {
             ?.first()?.let { it.toProduct(seriesMapFunction(it)) }
 
     @Transactional
-    override fun create(
-        createRequest: ProductCreateRequest,
-        series: List<Series>,
-        manufacturer: Manufacturer,
-        pharmaceuticalForm: PharmaceuticalForm
-    ): Product =
+    override fun create(createRequest: ProductCreateRequest): Product =
         ProductsTable
             .insert { body ->
                 body[article] = createRequest.article
                 body[name] = createRequest.name
                 body[price] = createRequest.price
                 createRequest.discount?.let { body[discount] = it }
-                body[manufacturerId] = createRequest.manufacturerId
-                body[pharmaceuticalFormId] = createRequest.pharmaceuticalFormId
+                body[manufacturerId] = createRequest.manufacturer.id
+                body[pharmaceuticalFormId] = createRequest.pharmaceuticalForm.id
                 createRequest.description?.let { body[description] = it }
                 createRequest.imagePath?.let { body[imagePath] = it }
             }
             .resultedValues!!.first().toProduct(
-                series,
-                manufacturer = manufacturer,
-                pharmaceuticalForm = pharmaceuticalForm
+                createRequest.series,
+                manufacturer = createRequest.manufacturer,
+                pharmaceuticalForm = createRequest.pharmaceuticalForm
             ).also { product ->
                 ProductSeriesTable.batchInsert(
-                    series,
+                    createRequest.series,
                     shouldReturnGeneratedValues = false
                 ) { data ->
                     this[ProductSeriesTable.productId] = product.id
@@ -116,4 +110,28 @@ class ProductRepositoryExposedImpl : ProductRepository {
                 }
         } else emptyList()
     }
+
+    private fun ResultRow.toProduct(
+        series: List<Series>,
+        manufacturer: Manufacturer = Manufacturer(
+            id = get(ManufacturersTable.id).value,
+            name = get(ManufacturersTable.name)
+        ),
+        pharmaceuticalForm: PharmaceuticalForm = PharmaceuticalForm(
+            id = get(PharmaceuticalFormsTable.id).value,
+            name = get(PharmaceuticalFormsTable.name)
+        ),
+    ): Product =
+        Product(
+            id = get(ProductsTable.id).value,
+            article = get(ProductsTable.article),
+            name = get(ProductsTable.name),
+            price = get(ProductsTable.price),
+            discount = get(ProductsTable.discount),
+            manufacturer = manufacturer,
+            pharmaceuticalForm = pharmaceuticalForm,
+            series = series,
+            description = get(ProductsTable.description),
+            imagePath = get(ProductsTable.imagePath)
+        )
 }

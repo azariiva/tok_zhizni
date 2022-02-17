@@ -3,11 +3,10 @@ package ru.mospolytech.tok_zhizni.repository.exposed
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.entity.PharmaceuticalForm
-import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormCreateRequest
-import ru.mospolytech.tok_zhizni.entity.PharmaceuticalFormUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.PharmaceuticalForm
+import ru.mospolytech.tok_zhizni.entity.domain.PharmaceuticalFormCreateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.PharmaceuticalFormUpdateRequest
 import ru.mospolytech.tok_zhizni.repository.PharmaceuticalFormsRepository
-import ru.mospolytech.tok_zhizni.repository.exposed.extension.toPharmaceuticalForm
 import ru.mospolytech.tok_zhizni.repository.exposed.table.PharmaceuticalFormsTable
 
 @Repository
@@ -16,7 +15,7 @@ class PharmaceuticalFormsRepositoryExposedImpl : PharmaceuticalFormsRepository {
     override fun find(): List<PharmaceuticalForm> =
         PharmaceuticalFormsTable
             .selectAll()
-            .map(ResultRow::toPharmaceuticalForm)
+            .map { it.toPharmaceuticalForm() }
 
     @Transactional(readOnly = true)
     override fun find(id: Long): PharmaceuticalForm? =
@@ -45,4 +44,10 @@ class PharmaceuticalFormsRepositoryExposedImpl : PharmaceuticalFormsRepository {
         PharmaceuticalFormsTable
             .deleteWhere { PharmaceuticalFormsTable.id eq id }
     }
+
+    fun ResultRow.toPharmaceuticalForm(): PharmaceuticalForm =
+        PharmaceuticalForm(
+            id = get(PharmaceuticalFormsTable.id).value,
+            name = get(PharmaceuticalFormsTable.name)
+        )
 }

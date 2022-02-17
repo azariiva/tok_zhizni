@@ -3,11 +3,10 @@ package ru.mospolytech.tok_zhizni.repository.exposed
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.entity.Manufacturer
-import ru.mospolytech.tok_zhizni.entity.ManufacturerCreateRequest
-import ru.mospolytech.tok_zhizni.entity.ManufacturerUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.Manufacturer
+import ru.mospolytech.tok_zhizni.entity.domain.ManufacturerCreateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.ManufacturerUpdateRequest
 import ru.mospolytech.tok_zhizni.repository.ManufacturersRepository
-import ru.mospolytech.tok_zhizni.repository.exposed.extension.toManufacturer
 import ru.mospolytech.tok_zhizni.repository.exposed.table.ManufacturersTable
 
 @Repository
@@ -16,7 +15,7 @@ class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
     override fun find(): List<Manufacturer> =
         ManufacturersTable
             .selectAll()
-            .map(ResultRow::toManufacturer)
+            .map { it.toManufacturer() }
 
     @Transactional(readOnly = true)
     override fun find(id: Long): Manufacturer? =
@@ -45,4 +44,10 @@ class ManufacturersRepositoryExposedImpl : ManufacturersRepository {
         ManufacturersTable
             .deleteWhere { ManufacturersTable.id eq id }
     }
+
+    private fun ResultRow.toManufacturer(): Manufacturer =
+        Manufacturer(
+            id = get(ManufacturersTable.id).value,
+            name = get(ManufacturersTable.name)
+        )
 }

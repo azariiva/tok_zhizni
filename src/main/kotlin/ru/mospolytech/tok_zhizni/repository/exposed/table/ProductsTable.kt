@@ -2,7 +2,7 @@ package ru.mospolytech.tok_zhizni.repository.exposed.table
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.jetbrains.exposed.dao.id.IdTable
-import ru.mospolytech.tok_zhizni.entity.ProductDescription
+import ru.mospolytech.tok_zhizni.entity.domain.ProductDescription
 import ru.mospolytech.tok_zhizni.repository.exposed.extension.jsonb
 
 object ProductsTable: IdTable<Long>("products") {

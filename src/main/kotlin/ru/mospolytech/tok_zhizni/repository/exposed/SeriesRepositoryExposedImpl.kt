@@ -3,11 +3,10 @@ package ru.mospolytech.tok_zhizni.repository.exposed
 import org.jetbrains.exposed.sql.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import ru.mospolytech.tok_zhizni.entity.Series
-import ru.mospolytech.tok_zhizni.entity.SeriesCreateRequest
-import ru.mospolytech.tok_zhizni.entity.SeriesUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.Series
+import ru.mospolytech.tok_zhizni.entity.domain.SeriesCreateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.SeriesUpdateRequest
 import ru.mospolytech.tok_zhizni.repository.SeriesRepository
-import ru.mospolytech.tok_zhizni.repository.exposed.extension.toSeries
 import ru.mospolytech.tok_zhizni.repository.exposed.table.SeriesTable
 
 @Repository
@@ -16,13 +15,13 @@ class SeriesRepositoryExposedImpl : SeriesRepository {
     override fun find(): List<Series> =
         SeriesTable
             .selectAll()
-            .map(ResultRow::toSeries)
+            .map { it.toSeries() }
 
     @Transactional(readOnly = true)
     override fun find(ids: List<Long>): List<Series> =
         SeriesTable
             .select { SeriesTable.id inList ids }
-            .map(ResultRow::toSeries)
+            .map { it.toSeries() }
 
     @Transactional(readOnly = true)
     override fun find(id: Long): Series? =
@@ -51,4 +50,10 @@ class SeriesRepositoryExposedImpl : SeriesRepository {
         SeriesTable
             .deleteWhere { SeriesTable.id eq id }
     }
+
+    private fun ResultRow.toSeries(): Series =
+        Series(
+            id = get(SeriesTable.id).value,
+            name = get(SeriesTable.name)
+        )
 }

@@ -1,14 +1,9 @@
 package ru.mospolytech.tok_zhizni.repository
 
-import ru.mospolytech.tok_zhizni.entity.Series
-import ru.mospolytech.tok_zhizni.entity.SeriesCreateRequest
-import ru.mospolytech.tok_zhizni.entity.SeriesUpdateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.Series
+import ru.mospolytech.tok_zhizni.entity.domain.SeriesCreateRequest
+import ru.mospolytech.tok_zhizni.entity.domain.SeriesUpdateRequest
 
-interface SeriesRepository {
-    fun find(): List<Series>
+interface SeriesRepository : CrudRepository<SeriesCreateRequest, SeriesUpdateRequest, Series> {
     fun find(ids: List<Long>): List<Series>
-    fun find(id: Long): Series?
-    fun create(createRequest: SeriesCreateRequest): Series
-    fun update(id: Long, updateRequest: SeriesUpdateRequest)
-    fun delete(id: Long)
 }

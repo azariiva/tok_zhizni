@@ -1,15 +1,10 @@
 package ru.mospolytech.tok_zhizni.service
 
 import org.springframework.stereotype.Service
-import ru.mospolytech.tok_zhizni.entity.*
-import ru.mospolytech.tok_zhizni.entity.exception.ManufacturerNotFound
-import ru.mospolytech.tok_zhizni.entity.exception.PharmaceuticalFormNotFound
-import ru.mospolytech.tok_zhizni.entity.exception.ProductNotFound
-import ru.mospolytech.tok_zhizni.entity.exception.SeriesNotFound
-import ru.mospolytech.tok_zhizni.repository.ManufacturersRepository
-import ru.mospolytech.tok_zhizni.repository.PharmaceuticalFormsRepository
-import ru.mospolytech.tok_zhizni.repository.ProductRepository
-import ru.mospolytech.tok_zhizni.repository.SeriesRepository
+import ru.mospolytech.tok_zhizni.entity.domain.*
+import ru.mospolytech.tok_zhizni.entity.dto.*
+import ru.mospolytech.tok_zhizni.entity.exception.*
+import ru.mospolytech.tok_zhizni.repository.*
 
 @Suppress("SpellCheckingInspection")
 @Service
@@ -17,57 +12,58 @@ class TokZhizniServiceImpl(
     private val manufacturersRepository: ManufacturersRepository,
     private val pharmaceuticalFormsRepository: PharmaceuticalFormsRepository,
     private val seriesRepository: SeriesRepository,
-    private val productRepository: ProductRepository
+    private val productsRepository: ProductsRepository,
+    private val usersRepository: UsersRepository
 ) : TokZhizniService {
-    override fun addManufacturer(createRequest: ManufacturerCreateRequest): Manufacturer =
-        manufacturersRepository.create(createRequest)
+    override fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto =
+        manufacturersRepository.create(ManufacturerCreateRequest(createRequest)).toDto()
 
-    override fun updateManufacturer(id: Long, updateRequest: ManufacturerUpdateRequest) {
+    override fun updateManufacturer(id: Long, updateRequest: ManufacturerUpdateRequestDto) {
         manufacturersRepository.find(id) ?: throw ManufacturerNotFound()
-        manufacturersRepository.update(id, updateRequest)
+        manufacturersRepository.update(id, ManufacturerUpdateRequest(updateRequest))
     }
 
-    override fun getAllManufacturers(): List<Manufacturer> =
-        manufacturersRepository.find()
+    override fun getAllManufacturers(): List<ManufacturerDto> =
+        manufacturersRepository.find().map { it.toDto() }
 
     override fun deleteManufacturer(id: Long) {
         manufacturersRepository.find(id) ?: throw ManufacturerNotFound()
         manufacturersRepository.delete(id)
     }
 
-    override fun addPharmaceuticalForm(createRequest: PharmaceuticalFormCreateRequest): PharmaceuticalForm =
-        pharmaceuticalFormsRepository.create(createRequest)
+    override fun addPharmaceuticalForm(createRequest: PharmaceuticalFormCreateRequestDto): PharmaceuticalFormDto =
+        pharmaceuticalFormsRepository.create(PharmaceuticalFormCreateRequest(createRequest)).toDto()
 
-    override fun updatePharmaceuticalForm(id: Long, updateRequest: PharmaceuticalFormUpdateRequest) {
+    override fun updatePharmaceuticalForm(id: Long, updateRequest: PharmaceuticalFormUpdateRequestDto) {
         pharmaceuticalFormsRepository.find(id) ?: throw PharmaceuticalFormNotFound()
-        pharmaceuticalFormsRepository.update(id, updateRequest)
+        pharmaceuticalFormsRepository.update(id, PharmaceuticalFormUpdateRequest(updateRequest))
     }
 
-    override fun getAllPharmaceuticalForms(): List<PharmaceuticalForm> =
-        pharmaceuticalFormsRepository.find()
+    override fun getAllPharmaceuticalForms(): List<PharmaceuticalFormDto> =
+        pharmaceuticalFormsRepository.find().map { it.toDto() }
 
     override fun deletePharmaceuticalForm(id: Long) {
         pharmaceuticalFormsRepository.find(id) ?: throw PharmaceuticalFormNotFound()
         pharmaceuticalFormsRepository.delete(id)
     }
 
-    override fun addSeries(createRequest: SeriesCreateRequest): Series =
-        seriesRepository.create(createRequest)
+    override fun addSeries(createRequest: SeriesCreateRequestDto): SeriesDto =
+        seriesRepository.create(SeriesCreateRequest(createRequest)).toDto()
 
-    override fun updateSeries(id: Long, updateRequest: SeriesUpdateRequest) {
+    override fun updateSeries(id: Long, updateRequest: SeriesUpdateRequestDto) {
         seriesRepository.find(id) ?: throw SeriesNotFound()
-        seriesRepository.update(id, updateRequest)
+        seriesRepository.update(id, SeriesUpdateRequest(updateRequest))
     }
 
-    override fun getAllSeries(): List<Series> =
-        seriesRepository.find()
+    override fun getAllSeries(): List<SeriesDto> =
+        seriesRepository.find().map { it.toDto() }
 
     override fun deleteSeries(id: Long) {
         seriesRepository.find(id)
         seriesRepository.delete(id)
     }
 
-    override fun addProduct(createRequest: ProductCreateRequest): Product {
+    override fun addProduct(createRequest: ProductCreateRequestDto): ProductDto {
         val manufacturer = manufacturersRepository.find(createRequest.manufacturerId) ?: throw ManufacturerNotFound()
         val pharmaceuticalForm =
             pharmaceuticalFormsRepository.find(createRequest.pharmaceuticalFormId) ?: throw PharmaceuticalFormNotFound()
@@ -76,11 +72,11 @@ class TokZhizniServiceImpl(
 
         if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
 
-        return productRepository.create(createRequest, series, manufacturer, pharmaceuticalForm)
+        return productsRepository.create(ProductCreateRequest(createRequest, series, manufacturer, pharmaceuticalForm)).toDto()
     }
 
-    override fun updateProduct(id: Long, updateRequest: ProductUpdateRequest) {
-        productRepository.find(id) ?: throw ProductNotFound()
+    override fun updateProduct(id: Long, updateRequest: ProductUpdateRequestDto) {
+        productsRepository.find(id) ?: throw ProductNotFound()
         updateRequest.manufacturerId?.let { manufacturersRepository.find(it) ?: throw ManufacturerNotFound() }
         updateRequest.pharmaceuticalFormId?.let {
             pharmaceuticalFormsRepository.find(it) ?: throw PharmaceuticalFormNotFound()
@@ -90,17 +86,43 @@ class TokZhizniServiceImpl(
             if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
         }
 
-        productRepository.update(id, updateRequest)
+        productsRepository.update(id, ProductUpdateRequest(updateRequest))
     }
 
-    override fun getProduct(id: Long): Product =
-        productRepository.find(id) ?: throw ProductNotFound()
+    override fun getProduct(id: Long): ProductDto =
+        (productsRepository.find(id) ?: throw ProductNotFound()).toDto()
 
-    override fun getAllProducts(): List<Product> =
-        productRepository.find()
+    override fun getAllProducts(): List<ProductDto> =
+        productsRepository.find().map { it.toDto() }
 
     override fun deleteProduct(id: Long) {
-        productRepository.find(id) ?: throw ProductNotFound()
-        productRepository.delete(id)
+        productsRepository.find(id) ?: throw ProductNotFound()
+        productsRepository.delete(id)
+    }
+
+    override fun addUser(createRequest: UserCreateRequestDto): UserDto {
+        val user = UserCreateRequest(createRequest)
+        usersRepository.findByName(user.name)?.let { throw DuplicateUserLogin() }
+        usersRepository.findByEmail(user.email)?.let { throw DuplicateUserEmail() }
+        return usersRepository.create(user).toDto()
+    }
+
+    override fun updateUser(id: Long, updateRequestDto: UserUpdateRequestDto) {
+        val user = UserUpdateRequest(updateRequestDto)
+        usersRepository.find(id) ?: throw UserNotFound()
+        user.name?.let { usersRepository.findByName(it)?.let { throw DuplicateUserLogin() } }
+        user.email?.let { usersRepository.findByEmail(it)?.let { throw DuplicateUserEmail() } }
+        usersRepository.update(id, user)
+    }
+
+    override fun getUser(id: Long): UserDto =
+        (usersRepository.find(id) ?: throw UserNotFound()).toDto()
+
+    override fun getAllUsers(): List<UserDto> =
+        usersRepository.find().map { it.toDto() }
+
+    override fun deleteUser(id: Long) {
+        usersRepository.find(id) ?: throw UserNotFound()
+        usersRepository.delete(id)
     }
 }

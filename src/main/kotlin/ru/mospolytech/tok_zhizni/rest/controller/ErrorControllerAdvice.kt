@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import ru.mospolytech.tok_zhizni.entity.exception.DuplicateEntity
 import ru.mospolytech.tok_zhizni.entity.exception.EntityNotFound
 
 @ControllerAdvice
@@ -13,4 +14,9 @@ class ErrorControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun entityNotFound(ex: EntityNotFound): String = ex.toString()
+
+    @ExceptionHandler(value = [DuplicateEntity::class])
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun duplicateEntity(ex: DuplicateEntity): String = ex.toString()
 }

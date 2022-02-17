@@ -5,20 +5,19 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import ru.mospolytech.tok_zhizni.entity.*
+import ru.mospolytech.tok_zhizni.entity.dto.*
 import ru.mospolytech.tok_zhizni.service.TokZhizniService
 
 @Api(value = "", tags = ["Storage Controller"])
-@Suppress("SpellCheckingInspection")
 @Controller
-class TokZhizniStorageController(
+class StorageController(
     private val service: TokZhizniService
 ) {
     @ApiOperation(value = "", tags = ["Manufacturers"])
     @GetMapping("/manufacturers")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    fun loadManufacturers(): List<Manufacturer> =
+    fun loadManufacturers(): List<ManufacturerDto> =
         service.getAllManufacturers()
 
     @ApiOperation(value = "", tags = ["Manufacturers"])
@@ -26,8 +25,8 @@ class TokZhizniStorageController(
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     fun createManufacturer(
-        @RequestBody createRequest: ManufacturerCreateRequest
-    ): Manufacturer =
+        @RequestBody createRequest: ManufacturerCreateRequestDto
+    ): ManufacturerDto =
         service.addManufacturer(createRequest)
 
     @ApiOperation(value = "", tags = ["Manufacturers"])
@@ -35,7 +34,7 @@ class TokZhizniStorageController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateManufacturer(
         @PathVariable("id") id: Long,
-        @RequestBody updateRequest: ManufacturerUpdateRequest
+        @RequestBody updateRequest: ManufacturerUpdateRequestDto
     ) {
         service.updateManufacturer(id, updateRequest)
     }
@@ -53,7 +52,7 @@ class TokZhizniStorageController(
     @GetMapping("/pharmaceutical_forms")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    fun loadPharmaceuticalForms(): List<PharmaceuticalForm> =
+    fun loadPharmaceuticalForms(): List<PharmaceuticalFormDto> =
         service.getAllPharmaceuticalForms()
 
     @ApiOperation(value = "", tags = ["Pharmaceutical Forms"])
@@ -61,8 +60,8 @@ class TokZhizniStorageController(
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     fun createPharmaceuticalForm(
-        @RequestBody createRequest: PharmaceuticalFormCreateRequest
-    ): PharmaceuticalForm =
+        @RequestBody createRequest: PharmaceuticalFormCreateRequestDto
+    ): PharmaceuticalFormDto =
         service.addPharmaceuticalForm(createRequest)
 
     @ApiOperation(value = "", tags = ["Pharmaceutical Forms"])
@@ -70,7 +69,7 @@ class TokZhizniStorageController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updatePharmaceuticalForm(
         @PathVariable("id") id: Long,
-        @RequestBody updateRequest: PharmaceuticalFormUpdateRequest
+        @RequestBody updateRequest: PharmaceuticalFormUpdateRequestDto
     ) {
         service.updatePharmaceuticalForm(id, updateRequest)
     }
@@ -88,7 +87,7 @@ class TokZhizniStorageController(
     @GetMapping("/series")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    fun loadSeries(): List<Series> =
+    fun loadSeries(): List<SeriesDto> =
         service.getAllSeries()
 
     @ApiOperation(value = "", tags = ["Series"])
@@ -96,8 +95,8 @@ class TokZhizniStorageController(
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     fun createSeries(
-        @RequestBody createRequest: SeriesCreateRequest
-    ): Series =
+        @RequestBody createRequest: SeriesCreateRequestDto
+    ): SeriesDto =
         service.addSeries(createRequest)
 
     @ApiOperation(value = "", tags = ["Series"])
@@ -105,7 +104,7 @@ class TokZhizniStorageController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateSeries(
         @PathVariable("id") id: Long,
-        @RequestBody updateRequest: SeriesUpdateRequest
+        @RequestBody updateRequest: SeriesUpdateRequestDto
     ) {
         service.updateSeries(id, updateRequest)
     }
@@ -124,8 +123,8 @@ class TokZhizniStorageController(
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     fun createProduct(
-        @RequestBody createRequest: ProductCreateRequest
-    ): Product =
+        @RequestBody createRequest: ProductCreateRequestDto
+    ): ProductDto =
         service.addProduct(createRequest)
 
     @ApiOperation(value = "", tags = ["Products"])
@@ -133,7 +132,7 @@ class TokZhizniStorageController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateProduct(
         @PathVariable("id") id: Long,
-        @RequestBody updateRequest: ProductUpdateRequest
+        @RequestBody updateRequest: ProductUpdateRequestDto
     ) {
         service.updateProduct(id, updateRequest)
     }
@@ -144,14 +143,14 @@ class TokZhizniStorageController(
     @ResponseStatus(HttpStatus.OK)
     fun loadProduct(
         @PathVariable("id") id: Long
-    ): Product =
+    ): ProductDto =
         service.getProduct(id)
 
     @ApiOperation(value = "", tags = ["Products"])
     @GetMapping("/products")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    fun loadProduct(): List<Product> =
+    fun loadProduct(): List<ProductDto> =
         service.getAllProducts()
 
     @ApiOperation(value = "", tags = ["Products"])

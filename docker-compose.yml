@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
   db:
@@ -20,7 +20,7 @@ services:
         reservations:
           memory: 1536M
   app:
-    image: personal/tok_zhizni
+    build: .
 #    restart: always
     depends_on:
       - db
