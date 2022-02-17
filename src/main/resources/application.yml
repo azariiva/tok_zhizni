@@ -12,3 +12,8 @@ spring:
       schema: api_data
   liquibase:
     default-schema: api_data
+  security:
+    user:
+      name: admin
+      password: password
+      roles: ROLE_ADMIN ROLE_USER

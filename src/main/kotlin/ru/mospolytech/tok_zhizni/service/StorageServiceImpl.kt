@@ -8,13 +8,13 @@ import ru.mospolytech.tok_zhizni.repository.*
 
 @Suppress("SpellCheckingInspection")
 @Service
-class TokZhizniServiceImpl(
+class StorageServiceImpl(
     private val manufacturersRepository: ManufacturersRepository,
     private val pharmaceuticalFormsRepository: PharmaceuticalFormsRepository,
     private val seriesRepository: SeriesRepository,
     private val productsRepository: ProductsRepository,
     private val usersRepository: UsersRepository
-) : TokZhizniService {
+) : StorageService {
     override fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto =
         manufacturersRepository.create(ManufacturerCreateRequest(createRequest)).toDto()
 

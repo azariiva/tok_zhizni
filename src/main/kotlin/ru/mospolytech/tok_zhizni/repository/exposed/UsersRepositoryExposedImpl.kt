@@ -70,7 +70,7 @@ class UsersRepositoryExposedImpl(
         User(
             id = get(UsersTable.id).value,
             name = get(UsersTable.name),
-            password = cryptoLayer.decode(get(UsersTable.password)),
+            aPassword = cryptoLayer.decode(get(UsersTable.password)),
             email = get(UsersTable.email),
             isVerified = get(UsersTable.isVerified),
             registered = get(UsersTable.registered)

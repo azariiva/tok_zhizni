@@ -4,7 +4,7 @@ import ru.mospolytech.tok_zhizni.entity.dto.*
 
 
 @Suppress("SpellCheckingInspection")
-interface TokZhizniService {
+interface StorageService {
     fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto
     fun updateManufacturer(id: Long, updateRequest: ManufacturerUpdateRequestDto)
     fun getAllManufacturers(): List<ManufacturerDto>
