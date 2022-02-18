@@ -5,6 +5,14 @@ import ru.mospolytech.tok_zhizni.entity.domain.*
 import ru.mospolytech.tok_zhizni.entity.dto.*
 import ru.mospolytech.tok_zhizni.entity.exception.*
 import ru.mospolytech.tok_zhizni.repository.*
+import java.io.File
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import javax.annotation.PostConstruct
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.exists
 
 @Suppress("SpellCheckingInspection")
 @Service
@@ -124,5 +132,50 @@ class StorageServiceImpl(
     override fun deleteUser(id: Long) {
         usersRepository.find(id) ?: throw UserNotFound()
         usersRepository.delete(id)
+    }
+
+    override fun addImage(fileName: String, inputStream: InputStream) {
+        val targetLocation = baseImagesPath.resolve(fileName)
+        if (targetLocation.exists()) {
+            throw DuplicateImageName()
+        }
+        Files.copy(inputStream, targetLocation)
+    }
+
+    override fun updateImage(fileName: String, inputStream: InputStream) {
+        val targetLocation = baseImagesPath.resolve(fileName)
+        if (!targetLocation.exists()) {
+            throw ImageNotFound()
+        }
+        Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING)
+    }
+
+    override fun getImage(fileName: String): ByteArray {
+        val targetLocation = baseImagesPath.resolve(fileName)
+        if (!targetLocation.exists()) {
+            throw ImageNotFound()
+        }
+        return File(targetLocation.toUri()).readBytes()
+    }
+
+    override fun deleteImage(fileName: String) {
+        val targetLocation = baseImagesPath.resolve(fileName)
+        if (!targetLocation.exists()) {
+            throw ImageNotFound()
+        }
+        targetLocation.deleteExisting()
+    }
+
+    companion object {
+        private val baseImagesPath = Paths.get("src/main/resources/static/images/").toAbsolutePath().normalize()
+    }
+
+    @PostConstruct
+    fun createImagesFolder() {
+        File(baseImagesPath.toUri()).let { imagesDir ->
+            if (!imagesDir.exists()) {
+                imagesDir.mkdirs()
+            }
+        }
     }
 }

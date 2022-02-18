@@ -5,3 +5,5 @@ open class DuplicateEntity: RuntimeException()
 class DuplicateUserLogin: DuplicateEntity()
 
 class DuplicateUserEmail: DuplicateEntity()
+
+class DuplicateImageName: DuplicateEntity()

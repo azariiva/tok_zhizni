@@ -3,11 +3,14 @@ package ru.mospolytech.tok_zhizni.rest.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import ru.mospolytech.tok_zhizni.entity.domain.User
 import ru.mospolytech.tok_zhizni.entity.dto.*
 import ru.mospolytech.tok_zhizni.service.StorageService
@@ -161,7 +164,6 @@ class ApiController(
 
     @ApiOperation(value = "", tags = ["Products"])
     @GetMapping("/products")
-
     @ResponseStatus(HttpStatus.OK)
     fun loadProduct(): List<ProductDto> =
         service.getAllProducts()
@@ -174,6 +176,44 @@ class ApiController(
         @PathVariable("id") id: Long
     ) {
         service.deleteProduct(id)
+    }
+
+    @ApiOperation(value = "", tags = ["Images"])
+    @PostMapping("/images")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed("ADMIN")
+    fun createImage(
+        @RequestPart("file") file: MultipartFile
+    ) {
+        service.addImage(file.originalFilename!!, file.inputStream)
+    }
+
+    @ApiOperation(value = "", tags = ["Images"])
+    @PutMapping("/images")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed("ADMIN")
+    fun updateImage(
+        @RequestPart("file") file: MultipartFile
+    ) {
+        service.updateImage(file.originalFilename!!, file.inputStream)
+    }
+
+    @ApiOperation(value = "", tags = ["Images"])
+    @GetMapping(value = ["/images/{name}"], produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.TEXT_PLAIN_VALUE])
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    fun getImage(
+        @PathVariable("name") imageName: String
+    ): ByteArray = service.getImage(imageName)
+
+    @ApiOperation(value = "", tags = ["Images"])
+    @DeleteMapping("/images/{name}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed("ADMIN")
+    fun deleteImage(
+        @PathVariable("name") imageName: String
+    ) {
+        service.deleteImage(imageName)
     }
 
     @ApiOperation(value = "", tags = ["Users"])
@@ -191,7 +231,7 @@ class ApiController(
         session: HttpSession,
         @Valid @RequestBody updateRequest: UserUpdateRequestDto
     ) {
-        session.getAttribute("SPRING_SECURITY_CONTEXT")?.let { securityContext ->
+        session.getAttribute(SPRING_SECURITY_CONTEXT_KEY)?.let { securityContext ->
             (securityContext as SecurityContextImpl).authentication.principal.let { user ->
                 service.updateUser((user as User).id, updateRequest)
             }
@@ -199,13 +239,44 @@ class ApiController(
     }
 
     @ApiOperation(value = "", tags = ["Users"])
+    @GetMapping("/users/self")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun getUser(session: HttpSession) =
+        session.getAttribute(SPRING_SECURITY_CONTEXT_KEY)?.let { securityContext ->
+            (securityContext as SecurityContextImpl).authentication.principal.let { user ->
+                service.getUser((user as User).id)
+            }
+        }
+
+    @ApiOperation(value = "", tags = ["Users"])
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RolesAllowed("USER", "ADMIN")
+    @RolesAllowed("USER")
     fun logout(request: HttpServletRequest?, response: HttpServletResponse?) {
         val auth: Authentication? = SecurityContextHolder.getContext().authentication
         if (auth != null) {
             SecurityContextLogoutHandler().logout(request, response, auth)
         }
     }
+
+    @ApiOperation(value = "", tags = ["Users"])
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    fun login(
+        session: HttpSession,
+        request: HttpServletRequest?,
+        response: HttpServletResponse?
+    ) = getUser(session)
+
+    @ApiOperation(value = "", tags = ["Users"])
+    @GetMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("ADMIN")
+    fun getUsers() =
+        service.getAllUsers()
+
 }

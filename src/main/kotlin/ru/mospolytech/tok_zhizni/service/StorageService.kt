@@ -1,6 +1,7 @@
 package ru.mospolytech.tok_zhizni.service
 
 import ru.mospolytech.tok_zhizni.entity.dto.*
+import java.io.InputStream
 
 
 @Suppress("SpellCheckingInspection")
@@ -31,4 +32,9 @@ interface StorageService {
     fun getUser(id: Long): UserDto
     fun getAllUsers(): List<UserDto>
     fun deleteUser(id: Long)
+
+    fun addImage(fileName: String, inputStream: InputStream)
+    fun updateImage(fileName: String, inputStream: InputStream)
+    fun getImage(fileName: String): ByteArray
+    fun deleteImage(fileName: String)
 }
