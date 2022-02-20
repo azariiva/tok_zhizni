@@ -37,4 +37,7 @@ interface StorageService {
     fun updateImage(fileName: String, inputStream: InputStream)
     fun getImage(fileName: String): ByteArray
     fun deleteImage(fileName: String)
+
+    fun getUserCart(userId: Long): List<CartItemDto>
+    fun updateUserCart(userId: Long, updateRequest: List<CartItemUpdateRequestDto>)
 }

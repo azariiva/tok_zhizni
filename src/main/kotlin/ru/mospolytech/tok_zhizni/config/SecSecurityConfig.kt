@@ -1,13 +1,15 @@
 package ru.mospolytech.tok_zhizni.config
 
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import ru.mospolytech.tok_zhizni.service.UserDetailsServiceImpl
@@ -39,12 +41,14 @@ class SecSecurityConfig(
     override fun configure(http: HttpSecurity) {
         http
             .csrf().disable()
-                .httpBasic()
+            .cors()
             .and()
-                .authorizeRequests()
-                .anyRequest().permitAll()
+            .httpBasic().and()
+            .authorizeRequests()
+            .anyRequest().permitAll()
             .and()
-                .formLogin().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
+            .exceptionHandling().authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
     }
 
     override fun configure(web: WebSecurity) {
@@ -53,9 +57,13 @@ class SecSecurityConfig(
             .antMatchers(*AUTH_WHITELIST)
     }
 
-    override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedMethods("*")
-    }
+//    override fun addCorsMappings(registry: CorsRegistry) {
+//        registry.addMapping("/**")
+//            .allowedOrigins("*")
+////            .allowCredentials(true)
+//            .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS")
+//            .allowedHeaders("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Headers", "X-Requested-With")
+//    }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("swagger-ui.html")

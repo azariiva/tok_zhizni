@@ -81,57 +81,58 @@ class ProductsRepositoryExposedImpl : ProductsRepository {
             .deleteWhere { ProductsTable.id eq id }
     }
 
-    // FIXME: all stuff below could be implemented better
-
-    private val concatSeparator = ";"
     private val groupingValues =
         (ProductsTable.columns + ManufacturersTable.columns + PharmaceuticalFormsTable.columns)
-    private val seriesIdsAggregate = SeriesTable.id.castTo<String?>(TextColumnType()).groupConcat(concatSeparator)
-    private val seriesNamesAggregate =
-        SeriesTable.name.castTo<String?>(TextColumnType()).groupConcat(concatSeparator)
 
     private inline fun baseSelectQuery(request: FieldSet.() -> Query): Query =
         (ProductsTable leftJoin ProductSeriesTable leftJoin SeriesTable innerJoin ManufacturersTable innerJoin PharmaceuticalFormsTable)
             .slice(groupingValues + seriesIdsAggregate + seriesNamesAggregate)
             .request()
             .groupBy(*groupingValues.toTypedArray())
-
-    private fun seriesMapFunction(row: ResultRow): List<Series> {
-        val seriesIds = row[seriesIdsAggregate]?.split(concatSeparator)
-        val seriesNames = row[seriesNamesAggregate]?.split(concatSeparator)
-
-        return if (seriesIds != null && seriesNames != null) {
-            seriesIds.zip(seriesNames)
-                .map { seriesPair ->
-                    Series(
-                        id = seriesPair.first.toLong(),
-                        name = seriesPair.second
-                    )
-                }
-        } else emptyList()
-    }
-
-    private fun ResultRow.toProduct(
-        series: List<Series>,
-        manufacturer: Manufacturer = Manufacturer(
-            id = get(ManufacturersTable.id).value,
-            name = get(ManufacturersTable.name)
-        ),
-        pharmaceuticalForm: PharmaceuticalForm = PharmaceuticalForm(
-            id = get(PharmaceuticalFormsTable.id).value,
-            name = get(PharmaceuticalFormsTable.name)
-        ),
-    ): Product =
-        Product(
-            id = get(ProductsTable.id).value,
-            article = get(ProductsTable.article),
-            name = get(ProductsTable.name),
-            price = get(ProductsTable.price),
-            discount = get(ProductsTable.discount),
-            manufacturer = manufacturer,
-            pharmaceuticalForm = pharmaceuticalForm,
-            series = series,
-            description = get(ProductsTable.description),
-            imagePath = get(ProductsTable.imagePath)
-        )
 }
+
+// FIXME: all stuff below could be implemented better
+
+val concatSeparator = ";"
+val seriesIdsAggregate = SeriesTable.id.castTo<String?>(TextColumnType()).groupConcat(concatSeparator)
+val seriesNamesAggregate =
+    SeriesTable.name.castTo<String?>(TextColumnType()).groupConcat(concatSeparator)
+
+fun seriesMapFunction(row: ResultRow): List<Series> {
+    val seriesIds = row[seriesIdsAggregate]?.split(concatSeparator)
+    val seriesNames = row[seriesNamesAggregate]?.split(concatSeparator)
+
+    return if (seriesIds != null && seriesNames != null) {
+        seriesIds.zip(seriesNames)
+            .map { seriesPair ->
+                Series(
+                    id = seriesPair.first.toLong(),
+                    name = seriesPair.second
+                )
+            }
+    } else emptyList()
+}
+
+fun ResultRow.toProduct(
+    series: List<Series>,
+    manufacturer: Manufacturer = Manufacturer(
+        id = get(ManufacturersTable.id).value,
+        name = get(ManufacturersTable.name)
+    ),
+    pharmaceuticalForm: PharmaceuticalForm = PharmaceuticalForm(
+        id = get(PharmaceuticalFormsTable.id).value,
+        name = get(PharmaceuticalFormsTable.name)
+    ),
+): Product =
+    Product(
+        id = get(ProductsTable.id).value,
+        article = get(ProductsTable.article),
+        name = get(ProductsTable.name),
+        price = get(ProductsTable.price),
+        discount = get(ProductsTable.discount),
+        manufacturer = manufacturer,
+        pharmaceuticalForm = pharmaceuticalForm,
+        series = series,
+        description = get(ProductsTable.description),
+        imagePath = get(ProductsTable.imagePath)
+    )

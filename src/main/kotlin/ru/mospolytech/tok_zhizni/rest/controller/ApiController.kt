@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import ru.mospolytech.tok_zhizni.entity.domain.User
@@ -22,6 +23,12 @@ import javax.validation.Valid
 
 
 @Api(value = "", tags = ["Storage Controller"])
+@CrossOrigin(
+    allowCredentials = "true",
+    origins = ["http://143.47.226.214:3000", "http://localhost:3000"],
+    methods = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS],
+    allowedHeaders = ["Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Headers", "X-Requested-With"]
+)
 @RestController
 class ApiController(
     private val service: StorageService
@@ -179,27 +186,32 @@ class ApiController(
     }
 
     @ApiOperation(value = "", tags = ["Images"])
-    @PostMapping("/images")
+    @PostMapping("/images/{name}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RolesAllowed("ADMIN")
     fun createImage(
+        @PathVariable("name") imageName: String,
         @RequestPart("file") file: MultipartFile
     ) {
-        service.addImage(file.originalFilename!!, file.inputStream)
+        service.addImage(imageName, file.inputStream)
     }
 
     @ApiOperation(value = "", tags = ["Images"])
-    @PutMapping("/images")
+    @PutMapping("/images/{name}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RolesAllowed("ADMIN")
     fun updateImage(
+        @PathVariable("name") imageName: String,
         @RequestPart("file") file: MultipartFile
     ) {
-        service.updateImage(file.originalFilename!!, file.inputStream)
+        service.updateImage(imageName, file.inputStream)
     }
 
     @ApiOperation(value = "", tags = ["Images"])
-    @GetMapping(value = ["/images/{name}"], produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.TEXT_PLAIN_VALUE])
+    @GetMapping(
+        value = ["/images/{name}"],
+        produces = [MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.TEXT_PLAIN_VALUE]
+    )
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     fun getImage(
@@ -279,4 +291,23 @@ class ApiController(
     fun getUsers() =
         service.getAllUsers()
 
+    @ApiOperation(value = "", tags = ["Cart"])
+    @GetMapping("/cart")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun getUserCart(session: HttpSession): List<CartItemDto> =
+        service.getUserCart(getUser(session)!!.id)
+
+    @ApiOperation(value = "", tags = ["Cart"])
+    @PutMapping("/cart")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun updateUserCart(
+        session: HttpSession,
+        @Validated @RequestBody updateRequest: List<CartItemUpdateRequestDto>
+    ) {
+        service.updateUserCart(getUser(session)!!.id, updateRequest)
+    }
 }

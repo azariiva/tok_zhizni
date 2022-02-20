@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-cart
+      author: IRZaripov
+      comment: "Создание таблицы корзины"
+      changes:
+        - createTable:
+            tableName: carts
+            remarks: "Таблица корзин пользователей"
+            columns:
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: product_id_fk
+                    referencedTableName: products
+                    referencedColumnNames: id
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: user_id_fk
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: quantity
+                  type: int
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: create-index-cart
+      author: IRZaripov
+      changes:
+        - createIndex:
+            indexName: idx_cart_item
+            tableName: carts
+            unique: true
+            columns:
+              - column:
+                  name: product_id
+              - column:
+                  name: user_id

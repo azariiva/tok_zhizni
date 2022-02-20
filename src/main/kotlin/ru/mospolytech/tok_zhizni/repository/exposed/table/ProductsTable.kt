@@ -16,5 +16,5 @@ object ProductsTable: IdTable<Long>("products") {
     val description = jsonb("description", ProductDescription::class.java, jacksonObjectMapper()).nullable()
     val imagePath = text("image_path").nullable()
 
-    override val primaryKey: PrimaryKey by lazy { super.primaryKey ?: PrimaryKey(ManufacturersTable.id) }
+    override val primaryKey: PrimaryKey by lazy { super.primaryKey ?: PrimaryKey(id) }
 }

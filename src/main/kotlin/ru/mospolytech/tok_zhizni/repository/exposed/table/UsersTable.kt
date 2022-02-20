@@ -12,5 +12,5 @@ object UsersTable: IdTable<Long>("users") {
     val isVerified = bool("is_verified").default(false)
     val registered = date("registered_at_ts").clientDefault { DateTime.now() }
 
-    override val primaryKey: PrimaryKey by lazy { super.primaryKey ?: PrimaryKey(ManufacturersTable.id) }
+    override val primaryKey: PrimaryKey by lazy { super.primaryKey ?: PrimaryKey(id) }
 }

@@ -21,7 +21,8 @@ class StorageServiceImpl(
     private val pharmaceuticalFormsRepository: PharmaceuticalFormsRepository,
     private val seriesRepository: SeriesRepository,
     private val productsRepository: ProductsRepository,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    private val cartsRepository: CartsRepository
 ) : StorageService {
     override fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto =
         manufacturersRepository.create(ManufacturerCreateRequest(createRequest)).toDto()
@@ -80,7 +81,8 @@ class StorageServiceImpl(
 
         if (illegalSeries.isNotEmpty()) throw SeriesNotFound()
 
-        return productsRepository.create(ProductCreateRequest(createRequest, series, manufacturer, pharmaceuticalForm)).toDto()
+        return productsRepository.create(ProductCreateRequest(createRequest, series, manufacturer, pharmaceuticalForm))
+            .toDto()
     }
 
     override fun updateProduct(id: Long, updateRequest: ProductUpdateRequestDto) {
@@ -164,6 +166,18 @@ class StorageServiceImpl(
             throw ImageNotFound()
         }
         targetLocation.deleteExisting()
+    }
+
+    override fun getUserCart(userId: Long): List<CartItemDto> =
+        cartsRepository.find(userId).map { it.toDto() }
+
+    override fun updateUserCart(userId: Long, updateRequest: List<CartItemUpdateRequestDto>) {
+        cartsRepository.update(
+            userId,
+            updateRequest.filter { it.quantity!! > 0 }.map { CartItemUpdateRequest(it) })
+        cartsRepository.delete(
+            userId,
+            updateRequest.filter { it.quantity!! <= 0 }.map { it.productId!! })
     }
 
     companion object {
