@@ -40,4 +40,10 @@ interface StorageService {
 
     fun getUserCart(userId: Long): List<CartItemDto>
     fun updateUserCart(userId: Long, updateRequest: List<CartItemUpdateRequestDto>)
+
+    fun addOrder(userId: Long, createRequest: OrderCreateRequestDto): OrderDto
+    fun updateOrder(orderId: Long, updateRequest: OrderUpdateRequestDto)
+    fun getOrder(id: Long): OrderDto
+    fun getAllOrders(): List<OrderDto>
+    fun getAllOrders(userId: Long): List<OrderDto>
 }

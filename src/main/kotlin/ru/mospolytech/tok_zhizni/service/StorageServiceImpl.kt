@@ -22,7 +22,8 @@ class StorageServiceImpl(
     private val seriesRepository: SeriesRepository,
     private val productsRepository: ProductsRepository,
     private val usersRepository: UsersRepository,
-    private val cartsRepository: CartsRepository
+    private val cartsRepository: CartsRepository,
+    private val ordersRepository: OrdersRepository
 ) : StorageService {
     override fun addManufacturer(createRequest: ManufacturerCreateRequestDto): ManufacturerDto =
         manufacturersRepository.create(ManufacturerCreateRequest(createRequest)).toDto()
@@ -179,6 +180,22 @@ class StorageServiceImpl(
             userId,
             updateRequest.filter { it.quantity!! <= 0 }.map { it.productId!! })
     }
+
+    override fun addOrder(userId: Long, createRequest: OrderCreateRequestDto): OrderDto =
+        ordersRepository.create(OrderCreateRequest(userId, createRequest)).toDto()
+
+    override fun updateOrder(orderId: Long, updateRequest: OrderUpdateRequestDto) {
+        ordersRepository.update(orderId, OrderUpdateRequest(updateRequest))
+    }
+
+    override fun getOrder(id: Long): OrderDto =
+        ordersRepository.find(id)?.toDto() ?: throw OrderNotFound()
+
+    override fun getAllOrders(): List<OrderDto> =
+        ordersRepository.find().map { it.toDto() }
+
+    override fun getAllOrders(userId: Long): List<OrderDto> =
+        ordersRepository.findByUser(userId).map { it.toDto() }
 
     companion object {
         private val baseImagesPath = Paths.get("src/main/resources/static/images/").toAbsolutePath().normalize()

@@ -1,6 +1,8 @@
 package ru.mospolytech.tok_zhizni.repository.exposed
 
 import org.jetbrains.exposed.sql.*
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import ru.mospolytech.tok_zhizni.entity.domain.*
@@ -14,6 +16,7 @@ class ProductsRepositoryExposedImpl : ProductsRepository {
         baseSelectQuery { selectAll() }
             .map { it.toProduct(seriesMapFunction(it)) }
 
+    @Cacheable("productCache", key = "#id")
     @Transactional(readOnly = true)
     override fun find(id: Long): Product? =
         baseSelectQuery { select { ProductsTable.id eq id } }
@@ -48,6 +51,7 @@ class ProductsRepositoryExposedImpl : ProductsRepository {
             }
 
     @Suppress("DuplicatedCode")
+    @CacheEvict("productCache", key = "#id")
     @Transactional
     override fun update(id: Long, updateRequest: ProductUpdateRequest) {
         ProductsTable

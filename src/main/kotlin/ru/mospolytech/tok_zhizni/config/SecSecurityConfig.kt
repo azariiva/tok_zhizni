@@ -57,14 +57,6 @@ class SecSecurityConfig(
             .antMatchers(*AUTH_WHITELIST)
     }
 
-//    override fun addCorsMappings(registry: CorsRegistry) {
-//        registry.addMapping("/**")
-//            .allowedOrigins("*")
-////            .allowCredentials(true)
-//            .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS")
-//            .allowedHeaders("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Headers", "X-Requested-With")
-//    }
-
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("swagger-ui.html")
             .addResourceLocations("classpath:/META-INF/resources/")

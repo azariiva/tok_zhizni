@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import ru.mospolytech.tok_zhizni.entity.exception.DuplicateEntity
 import ru.mospolytech.tok_zhizni.entity.exception.EntityNotFound
+import ru.mospolytech.tok_zhizni.entity.exception.PermissionDenied
 
 @ControllerAdvice
 class ErrorControllerAdvice {
@@ -19,4 +20,9 @@ class ErrorControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     fun duplicateEntity(ex: DuplicateEntity): String = ex.toString()
+
+    @ExceptionHandler(value = [PermissionDenied::class])
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    fun permissionDenied(ex: PermissionDenied): String = ex.toString()
 }

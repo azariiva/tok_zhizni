@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import ru.mospolytech.tok_zhizni.entity.domain.User
 import ru.mospolytech.tok_zhizni.entity.dto.*
+import ru.mospolytech.tok_zhizni.entity.exception.PermissionDenied
 import ru.mospolytech.tok_zhizni.service.StorageService
 import javax.annotation.security.RolesAllowed
 import javax.servlet.http.HttpServletRequest
@@ -25,7 +27,18 @@ import javax.validation.Valid
 @Api(value = "", tags = ["Storage Controller"])
 @CrossOrigin(
     allowCredentials = "true",
-    origins = ["http://143.47.226.214:3000", "http://localhost:3000"],
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:3030",
+//        "https://tokzhizni.com",
+//        "https://www.tokzhizni.com",
+//        "https://www.tokzhizni.com:443",
+//        "https://tokzhizni.com:443",
+//        "https://tokzhizni.com/admin",
+//        "https://www.tokzhizni.com/admin",
+//        "https://tokzhizni.com:443/admin",
+//        "https://www.tokzhizni.com:443/admin"
+    ],
     methods = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS],
     allowedHeaders = ["Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Headers", "X-Requested-With"]
 )
@@ -256,11 +269,7 @@ class ApiController(
     @ResponseBody
     @RolesAllowed("USER")
     fun getUser(session: HttpSession) =
-        session.getAttribute(SPRING_SECURITY_CONTEXT_KEY)?.let { securityContext ->
-            (securityContext as SecurityContextImpl).authentication.principal.let { user ->
-                service.getUser((user as User).id)
-            }
-        }
+        getRawUser(session).toDto()
 
     @ApiOperation(value = "", tags = ["Users"])
     @PostMapping("/logout")
@@ -281,7 +290,7 @@ class ApiController(
         session: HttpSession,
         request: HttpServletRequest?,
         response: HttpServletResponse?
-    ) = getUser(session)
+    ) = session.getAttribute(SPRING_SECURITY_CONTEXT_KEY)?.let { getUser(session) }
 
     @ApiOperation(value = "", tags = ["Users"])
     @GetMapping("/users")
@@ -297,7 +306,7 @@ class ApiController(
     @ResponseBody
     @RolesAllowed("USER")
     fun getUserCart(session: HttpSession): List<CartItemDto> =
-        service.getUserCart(getUser(session)!!.id)
+        service.getUserCart(getRawUser(session).id)
 
     @ApiOperation(value = "", tags = ["Cart"])
     @PutMapping("/cart")
@@ -308,6 +317,65 @@ class ApiController(
         session: HttpSession,
         @Validated @RequestBody updateRequest: List<CartItemUpdateRequestDto>
     ) {
-        service.updateUserCart(getUser(session)!!.id, updateRequest)
+        service.updateUserCart(getRawUser(session).id, updateRequest)
     }
+
+    @ApiOperation(value = "", tags = ["Order"])
+    @PostMapping("/order")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun createOrder(
+        session: HttpSession,
+        @Validated @RequestBody createRequestDto: OrderCreateRequestDto
+    ) = service.addOrder(getRawUser(session).id, createRequestDto)
+
+    @ApiOperation(value = "", tags = ["Order"])
+    @PutMapping("/order/{order_id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed("ADMIN")
+    fun updateOrder(
+        @PathVariable("order_id") orderId: Long,
+        @Validated @RequestBody updateRequestDto: OrderUpdateRequestDto
+    ) {
+        service.updateOrder(orderId, updateRequestDto)
+    }
+
+    @ApiOperation(value = "", tags = ["Order"])
+    @GetMapping("/order/{order_id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun getOrder(
+        session: HttpSession,
+        @PathVariable("order_id") orderId: Long
+    ): OrderDto =
+        service.getOrder(orderId).also {
+            val user = getRawUser(session)
+
+            if (!user.authorities.contains(SimpleGrantedAuthority("ROLE_ADMIN")) && it.userId != user.id) {
+                throw PermissionDenied()
+            }
+        }
+
+    @ApiOperation(value = "", tags = ["Order"])
+    @GetMapping("/order")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @RolesAllowed("USER")
+    fun getAllOrders(session: HttpSession): List<OrderDto> {
+        val user = getRawUser(session)
+        return if (user.authorities.contains(SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            service.getAllOrders()
+        } else {
+            service.getAllOrders(user.id)
+        }
+    }
+
+    private fun getRawUser(session: HttpSession): User =
+        session.getAttribute(SPRING_SECURITY_CONTEXT_KEY)!!.let { securityContext ->
+            (securityContext as SecurityContextImpl).authentication.principal.let { user ->
+                (user as User)
+            }
+        }
 }

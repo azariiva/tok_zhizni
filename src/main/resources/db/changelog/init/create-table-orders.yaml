@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-orders
+      author: IRZaripov
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: user_id_fk
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: shipment
+                  type: jsonb
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: int
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: order_id_fk
+                    referencedTableName: orders
+                    referencedColumnNames: id
+                    deleteCascade: true
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: product_id_fk
+                    referencedTableName: products
+                    referencedColumnNames: id
+                    deleteCascade: true
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: create-index-order-items
+      author: IRZaripov
+      changes:
+        - createIndex:
+            indexName: idx_order_item
+            tableName: order_items
+            unique: true
+            columns:
+              - column:
+                  name: order_id
+              - column:
+                  name: product_id

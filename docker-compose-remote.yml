@@ -6,7 +6,7 @@ services:
     command: postgres
     restart: always
     volumes:
-      - postgres-data:/var/lib/postgresql
+      - /home/ubuntu/docker-db-volume:/var/lib/postgresql/data
       - /home/ubuntu/src/docker/config/db/dbinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
@@ -20,7 +20,7 @@ services:
           memory: 3gb
   app:
     build: .
-    restart: always
+#    restart: always
     depends_on:
       - db
     volumes:
@@ -35,6 +35,14 @@ services:
           memory: 4gb
         reservations:
           memory: 2gb
-volumes:
-  postgres-data:
-    external: false
+#  sample:
+#    depends_on:
+#      - app
+#    volumes:
+#      - /home/ubuntu/zxc
+#      - /home/ubuntu/zxc/node_modules
+#    ports:
+#      - '3000:3000'
+#    environment:
+#      - CHOKIDAR_USEPOLLING=true
+#    image: 'sample:dev'

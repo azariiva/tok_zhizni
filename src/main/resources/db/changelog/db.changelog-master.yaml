@@ -12,6 +12,10 @@ databaseChangeLog:
       value: extract(epoch from current_timestamp)
       dbms: postgresql
 
+  - include:
+      file: db/changelog/init/create-table-users.yaml
+  - include:
+      file: db/changelog/init/create-table-products.yaml
   - includeAll:
       path: db/changelog/init
   - includeAll:

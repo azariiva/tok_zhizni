@@ -13,3 +13,5 @@ class ProductNotFound: EntityNotFound()
 class UserNotFound: EntityNotFound()
 
 class ImageNotFound: EntityNotFound()
+
+class OrderNotFound: EntityNotFound()

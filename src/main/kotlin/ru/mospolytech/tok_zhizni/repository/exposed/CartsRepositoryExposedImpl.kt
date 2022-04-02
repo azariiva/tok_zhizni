@@ -50,7 +50,7 @@ class CartsRepositoryExposedImpl : CartsRepository {
         (ProductsTable.columns + ManufacturersTable.columns + PharmaceuticalFormsTable.columns + CartsTable.columns)
 
     private inline fun baseSelectQuery(request: FieldSet.() -> Query): Query =
-        (CartsTable fullJoin ProductsTable leftJoin ProductSeriesTable leftJoin SeriesTable innerJoin ManufacturersTable innerJoin PharmaceuticalFormsTable)
+        (CartsTable innerJoin ProductsTable leftJoin ProductSeriesTable leftJoin SeriesTable innerJoin ManufacturersTable innerJoin PharmaceuticalFormsTable)
             .slice(groupingValues + seriesIdsAggregate + seriesNamesAggregate)
             .request()
             .groupBy(*groupingValues.toTypedArray())
